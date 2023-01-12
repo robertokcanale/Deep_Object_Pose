@@ -310,20 +310,23 @@ class ObjectDetector(object):
         obj_name = pnp_solver.object_name
 
         for obj in objects:
-            # Run PNP
-            points = obj[1] + [(obj[0][0]*8, obj[0][1]*8)]
-            cuboid2d = np.copy(points)
-            location, quaternion, projected_points = pnp_solver.solve_pnp(points)
+            if check_none():
+                continue
+            else:
+                # Run PNP
+                points = obj[1] + [(obj[0][0]*8, obj[0][1]*8)]
+                cuboid2d = np.copy(points)
+                location, quaternion, projected_points = pnp_solver.solve_pnp(points)
 
-            # Save results
-            detected_objects.append({
-                'name': obj_name,
-                'location': location,
-                'quaternion': quaternion,
-                'cuboid2d': cuboid2d,
-                'projected_points': projected_points,
-                'score': obj[-1],
-            })
+                # Save results
+                detected_objects.append({
+                    'name': obj_name,
+                    'location': location,
+                    'quaternion': quaternion,
+                    'cuboid2d': cuboid2d,
+                    'projected_points': projected_points,
+                    'score': obj[-1],
+                })
 
         return detected_objects
 
@@ -492,3 +495,14 @@ class ObjectDetector(object):
                         objects[i_best][2][i_lists] = (best_angle, best_dist)
 
         return objects, all_peaks
+
+
+def check_none(lst):
+    stack = [lst]
+    while stack:
+        item = stack.pop()
+        if isinstance(item, (list, tuple)):
+            stack.extend(item)
+        elif item is None:
+            return True
+    return False
